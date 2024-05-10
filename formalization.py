@@ -38,7 +38,6 @@ def result(state, action):
     turn = toMove(state)
     new_state = state
     # perform the action based on which colors turn it is
-
     # if its whites turn
     if turn == 1:
         if action[0] == 'advance':
@@ -97,11 +96,11 @@ def utility(state):
     possible_actions = actions(state)
     if not possible_actions:
         return 0
-    # if the state is a win return 1, otherwise return -1
+    # if the state is a win return 1, otherwise return 1/2
     if is_terminal(state):
         return 1
     else:
-        return -1
+        return 1/2
 
 INITIAL_STATE = [0, -1, -1, -1, 0, 0, 0, 1, 1, 1]
 
