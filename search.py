@@ -1,6 +1,7 @@
+# PART 2
+
 from formalization import toMove, is_terminal, actions, result, utility
 
-# PART 2
 def min_value(state):
     if is_terminal(state):
         return utility(state), None
@@ -33,15 +34,23 @@ def create_policy_table(start_state):
 
     while states:
         state = states.pop()
-        visited.add(state)
+        visited.add(state_to_string(state))
 
         if is_terminal(state):
-            policy_table[state] = None
+            policy_table[state_to_string(state)] = None
         else:
-            policy_table[state] = minimax_search(state)
+            policy_table[state_to_string(state)] = minimax_search(state)
             for action in actions(state):
                 next_state = result(state, action)
-                if next_state not in visited:
+                if state_to_string(next_state) not in visited:
                     states.append(next_state)
+
     return policy_table
+
+
+def state_to_string(state):
+    str_rep = ''
+    for s in state:
+        str_rep += str(s)
+    return str_rep
 

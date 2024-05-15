@@ -1,4 +1,7 @@
 # PART 1
+
+import copy
+
 def toMove(state):
     # return the player in the first index of the state
     return state[0]
@@ -36,7 +39,7 @@ def actions(state):
 
 def result(state, action):
     turn = toMove(state)
-    new_state = state
+    new_state = copy.deepcopy(state)
     # perform the action based on which colors turn it is
     # if its whites turn
     if turn == 1:
@@ -68,13 +71,13 @@ def is_terminal(state):
 
     # if it is whites turn
     if turn == 1:
-        if state[1] == 1 and state[2] == 1 and state[3] == 1:
+        if state[1] == 1 or state[2] == 1 or state[3] == 1:
             return True
     # if it is blacks turn
     elif turn == -1:
-        if state[7] == -1 and state[8] == -1 and state[9] == -1:
+        if state[7] == -1 or state[8] == -1 or state[9] == -1:
             return True
-        
+
     # get all the possible actions for current state
     possible_actions = actions(state)
 
