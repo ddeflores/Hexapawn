@@ -65,7 +65,7 @@ def result(state, action):
             new_state[action[1] + 1][action[2] - 1] = -1
             new_state[action[1]][action[2]] = 0
             
-    return new_state
+    return [turn, *new_state[0], *new_state[1], *new_state[2]]
 
 def is_terminal(state):
     # get the current players move

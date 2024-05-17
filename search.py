@@ -54,3 +54,7 @@ def state_to_string(state):
         str_rep += str(s)
     return str_rep
 
+if __name__ == '__main__':
+    state = [0, -1, -1, -1, 0, 0, 0, 1, 1, 1]
+    table = create_policy_table(state)
+    print(table)
