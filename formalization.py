@@ -38,10 +38,14 @@ def actions(state):
             
 
 def result(state, action):
+    # find out which colors turn it is
     turn = toMove(state)
+
+    # make a deep copy so that the original list isnt changed
     new_state = state_to_board(copy.deepcopy(state))
-    # perform the action based on which colors turn it is
-    # if its whites turn
+
+    '''perform the action based on which colors turn it is'''
+    # --> if its whites turn
     if turn == 0:
         if action[0] == 'advance':
             new_state[action[1] - 1][action[2]] = 1
@@ -53,7 +57,7 @@ def result(state, action):
             new_state[action[1] - 1][action[2] + 1] = 1
             new_state[action[1]][action[2]] = 0
 
-    # if its blacks turn
+    # --> if its blacks turn
     elif turn == 1:
         if action[0] == 'advance':
             new_state[action[1] + 1][action[2]] = -1
@@ -65,12 +69,14 @@ def result(state, action):
             new_state[action[1] + 1][action[2] - 1] = -1
             new_state[action[1]][action[2]] = 0
             
+    # return the new state in the correct form (1d list instead of 2d list)
     return [turn, *new_state[0], *new_state[1], *new_state[2]]
 
 def is_terminal(state):
     # get the current players move
     turn = toMove(state)
 
+    # if either colors pawn has reached the end
     if state[1] == 1 or state[2] == 1 or state[3] == 1:
         return True
     if state[7] == -1 or state[8] == -1 or state[9] == -1:
@@ -79,7 +85,7 @@ def is_terminal(state):
     # get all the possible actions for current state
     possible_actions = actions(state)
 
-    # if there is a draw
+    # if there is a draw (i.e. no possible moves for the current turn)
     if not possible_actions:
         return True
 
@@ -110,6 +116,7 @@ def get_index(i):
     elif i < 10:
         return [2, i - 7]
 
+# helper function to transform a 1d state list into a 2d state list for easier value manipulation
 def state_to_board(state):
     if len(state) == 10:
         return [state[1:4], state[4: 7], state[7:10]]
