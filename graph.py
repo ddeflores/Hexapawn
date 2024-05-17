@@ -90,15 +90,19 @@ class Graph:
             for edge in neuron.incoming:
                 edge.weight -= learning_rate * edge.from_neuron.output * neuron.delta
 
+# sigmoid activation function
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
 
+# relu activation function
 def relu(x):
     return max(0, x)
 
+# derivative of sigmoid
 def sigmoid_derivative(x):
     sig = sigmoid(x)
     return sig * (1 - sig)
 
+# derivative of relu
 def relu_derivative(x):
     return 1 if x > 0 else 0

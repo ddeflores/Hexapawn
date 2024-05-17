@@ -37,30 +37,51 @@ def minimax_search(state):
     value, move = max_value(state)
     return move
 
-
+# create a policy table from the initial state
 def create_policy_table(start_state):
+    # initialize policy table as a dict
     policy_table = {}
+
+    #initialize states queue
     states = [start_state]
+
+    # initialize visited states set
     visited = set()
 
+    # while the queue is not empty, process the states
     while states:
+        # pop a state from the queue for processing
         state = states.pop()
+
+        # add the state to the visited set in string form to save space
         visited.add(state_to_string(state))
 
+        # if the state is terminal, append a vector of 0s
         if is_terminal(state):
             policy_table[state_to_string(state)] = [0] * 9  # No valid moves
         else:
+            # find the best move for the given state
             best_move = minimax_search(state)
-            move_vector = [0] * 9
-            possible_moves = actions(state)
-            for i, move in enumerate(possible_moves):
-                if move == best_move:
-                    move_vector[i] = 1  # Ideal move
-                else:
-                    move_vector[i] = 0  # Non-ideal move
 
+            # initialize move vector to 0s
+            move_vector = [0] * 9
+
+            # get the possible moves for the given state
+            possible_moves = actions(state)
+
+            # iterate through every move, adjusting the vector as you go
+            for i, move in enumerate(possible_moves):
+                # 1 means it is an ideal move
+                if move == best_move:
+                    move_vector[i] = 1
+                # 0 means it is not
+                else:
+                    move_vector[i] = 0
+
+            # hash the state in the table and record its value as the move vector
             policy_table[state_to_string(state)] = move_vector
 
+            # add the resulting states for all possible actions to the queue
             for action in possible_moves:
                 next_state = result(state, action)
                 if state_to_string(next_state) not in visited:
