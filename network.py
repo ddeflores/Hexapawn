@@ -58,9 +58,11 @@ def output_to_action(state, output):
     # get all possible moves for the current state
     possible_moves = actions(state)
 
-    # sort each move by the associated confidence
+    # sort each move by its associated confidence in decreasing order
     move_confidences = [(output[i], possible_moves[i]) for i in range(len(possible_moves))]
     sorted_moves = sorted(move_confidences, reverse=True, key=lambda x: x[0])
+
+    # iterate through the sorted moves (highest to lowest confidence) and pick the first one that is possible
     for confidence, move in sorted_moves:
         if move in possible_moves:
             return move
@@ -141,7 +143,7 @@ def get_random_state(policy_table):
 
 if __name__ == '__main__':
     # make network
-    network = create_network(12, 6)
+    network = create_network(15, 3)
 
     # fetch training data from initial state
     policy_table = create_policy_table(INITIAL_STATE)
