@@ -42,9 +42,13 @@ def create_network(num_layers, num_nodes_per_layer):
     return graph
 
 # train the network based on training data (a policy table), a number of epochs to train for (defaults to 1000), and alpha (defaults to 0.01)
-def train_network(graph: Graph, training_data, epochs=1000, learning_rate=0.01):
+def train_network(graph: Graph, training_data, epochs=100, learning_rate=0.01):
     for epoch in range(epochs):
+        shuffled = []
         for key, expected_output in training_data.items():
+            shuffled.append((key, expected_output))
+        random.shuffle(shuffled)
+        for key, expected_output in shuffled:
             # turn the string representation of the state into a state ready for processing
             state = string_to_state(key)
             # classify the state
