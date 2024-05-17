@@ -65,7 +65,7 @@ class Graph:
 
         return outputs
     
-    def update_weights(self, outputs: list[Neuron]):
+    def update_weights(self, outputs: list[Neuron], learning_rate):
         # output layer deltas
         output_neurons: list[Neuron] = self.neurons[-len(outputs)]
         for neuron, expected in zip(output_neurons, outputs):
@@ -89,7 +89,7 @@ class Graph:
         # update all of the weights
         for neuron in self.neurons:
             for edge in neuron.incoming:
-                edge.weight -= edge.from_neuron.output * neuron.delta
+                edge.weight -= learning_rate * edge.from_neuron.output * neuron.delta
 
 def sigmoid(x):
     return 1 / (1 + math.exp(-x))
