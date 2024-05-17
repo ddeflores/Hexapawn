@@ -39,37 +39,35 @@ def minimax_search(state):
 
 
 def create_policy_table(start_state):
-    # initialize the policy table as a dictionary
     policy_table = {}
-
-    # initialize a queue of states to process 
     states = [start_state]
-
-    # initialize a set of visited states
     visited = set()
 
-    # while the queue is not empty, process the states
     while states:
-
-        # pop a state off the queue, and add it to the visited set as a string (to save memory)
         state = states.pop()
         visited.add(state_to_string(state))
 
-        # if the state is terminal, there is no move to add to the policy table --> otherwise, process the state
         if is_terminal(state):
-            policy_table[state_to_string(state)] = None
+            policy_table[state_to_string(state)] = [0] * 9  # No valid moves
         else:
-            # find the best move for that state and add it to the policy table
-            policy_table[state_to_string(state)] = minimax_search(state)
+            best_move = minimax_search(state)
+            move_vector = [0] * 9
+            possible_moves = actions(state)
+            for i, move in enumerate(possible_moves):
+                if move == best_move:
+                    move_vector[i] = 1  # Ideal move
+                else:
+                    move_vector[i] = 0  # Non-ideal move
 
-            # add the result of each possible action in the current state to the queue
-            for action in actions(state):
+            policy_table[state_to_string(state)] = move_vector
+
+            for action in possible_moves:
                 next_state = result(state, action)
                 if state_to_string(next_state) not in visited:
                     states.append(next_state)
 
-    # return the policy table when the queue is empty
     return policy_table
+
 
 # helper function to convert a state into its string representation for hashing
 def state_to_string(state):

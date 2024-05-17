@@ -70,7 +70,10 @@ def result(state, action):
             new_state[action[1]][action[2]] = 0
             
     # return the new state in the correct form (1d list instead of 2d list)
-    return [turn, *new_state[0], *new_state[1], *new_state[2]]
+    if turn == 0:
+        return [1, *new_state[0], *new_state[1], *new_state[2]]
+    else:
+        return [0, *new_state[0], *new_state[1], *new_state[2]]
 
 def is_terminal(state):
     # get the current players move

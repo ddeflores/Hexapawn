@@ -14,7 +14,10 @@ class Neuron:
     def __init__(self, activation_function='sigmoid'):
         self.incoming: list[Edge] = []
         self.outgoing: list[Edge] = []
-        self.activation_function = activation_function
+        if activation_function == 'sigmoid':
+            self.activation_function = sigmoid
+        else:
+            self.activation_function = relu
         self.output = 0
         self.input_sum = 0
         self.delta = 0
@@ -29,8 +32,9 @@ class Neuron:
 
     # get output from a neuron
     def get_output(self):
-        for edge in self.incoming:
-            self.input_sum += edge.weight * edge.from_neuron.output
+        self.input_sum = sum(edge.weight * edge.from_neuron.output for edge in self.incoming)
+        if self.activation_function == sigmoid:
+            self.input_sum = max(min(self.input_sum, 100), -100)  # Clip to prevent overflow
         self.output = self.activation_function(self.input_sum)
 
 class Graph:
@@ -51,40 +55,35 @@ class Graph:
 
     def classify(self, inputs):
         # start with initial inputs
-        for i, input in enumerate(inputs):
-            self.neurons[i].output = input
+        for i, input_value in enumerate(inputs):
+            self.neurons[i].output = input_value
         
         # process the next neurons
         for neuron in self.neurons[len(inputs):]:
             neuron.get_output()
         
         # get all of the outputs from the neurons
-        outputs = []
-        for neuron in self.neurons[len(inputs):]:
-            outputs.append(neuron.output)
-
-        return outputs
+        return [neuron.output for neuron in self.neurons[-9:]]
     
     def update_weights(self, outputs: list[Neuron], learning_rate):
         # output layer deltas
-        output_neurons: list[Neuron] = self.neurons[-len(outputs)]
+        output_neurons = self.neurons[-9:]
         for neuron, expected in zip(output_neurons, outputs):
             y_hat = neuron.output
             error = y_hat - expected
-            delta = 2 * error * neuron.activation_function(neuron.input_sum)
+            if neuron.activation_function == sigmoid:
+                delta = 2 * error * sigmoid_derivative(neuron.input_sum)
+            else:
+                delta = 2 * error * relu_derivative(neuron.input_sum)
             neuron.delta = delta
 
         # hidden layer deltas
-        for neuron in reversed(self.neurons[:-len(outputs)]):
-            if neuron.activation_function == 'sigmoid':
+        for neuron in reversed(self.neurons[:-9]):
+            if neuron.activation_function == sigmoid:
                 derivative = sigmoid_derivative(neuron.input_sum)
             else:
                 derivative = relu_derivative(neuron.input_sum)
-
-            delta_sum = 0
-            for edge in neuron.outgoing:
-                delta_sum += edge.to_neuron.delta * edge.weight
-            neuron.delta = delta_sum * derivative
+            neuron.delta = sum(edge.to_neuron.delta * edge.weight for edge in neuron.outgoing) * derivative
 
         # update all of the weights
         for neuron in self.neurons:
