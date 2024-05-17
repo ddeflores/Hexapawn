@@ -28,5 +28,5 @@ class Graph:
 
     def add_edge(self, from_neuron, to_neuron, weight):
         edge = Edge(weight)
-        from_neuron.add_outgoing_edge(edge)
-        to_neuron.add_incoming_edge(edge)
+        from_neuron.add_outgoing(edge)
+        to_neuron.add_incoming(edge)
