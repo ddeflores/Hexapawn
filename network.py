@@ -1,4 +1,4 @@
-# PART ^
+# PART 6
 
 from formalization import toMove, utility, actions, result, is_terminal, INITIAL_STATE
 from search import create_policy_table
@@ -42,21 +42,30 @@ def create_network(num_layers, num_nodes_per_layer):
     return graph
 
 # train the network based on training data (a policy table), a number of epochs to train for (defaults to 1000), and alpha (defaults to 0.01)
-def train_network(graph, training_data, epochs=1000, learning_rate=0.01):
+def train_network(graph: Graph, training_data, epochs=1000, learning_rate=0.01):
     for epoch in range(epochs):
         for key, expected_output in training_data.items():
+            # turn the string representation of the state into a state ready for processing
             state = string_to_state(key)
+            # classify the state
             graph.classify(state)
+
+            #update the weights
             graph.update_weights(expected_output, learning_rate)
 
-
+# turn an output from a neuron into an action
 def output_to_action(state, output):
+    # get all possible moves for the current state
     possible_moves = actions(state)
+
+    # sort each move by the associated confidence
     move_confidences = [(output[i], possible_moves[i]) for i in range(len(possible_moves))]
     sorted_moves = sorted(move_confidences, reverse=True, key=lambda x: x[0])
     for confidence, move in sorted_moves:
         if move in possible_moves:
             return move
+
+    # if the output is not in the possible moves, return a random move
     return random.choice(possible_moves)
 
 
@@ -73,10 +82,6 @@ def play_hexapawn(graph: Graph, start_state):
 
     # continue playing until a player has won, or there is a draw
     while not is_terminal(state):
-        if toMove(state) == 0:
-            player = "WHITES"
-        else:
-            player = "BLACKS"
         # get the output of the current state
         output = graph.classify(state)
 
@@ -85,15 +90,19 @@ def play_hexapawn(graph: Graph, start_state):
 
         # set the state to the result of the networks output move
         state = result(state, move)
-        print("It is " + player + ' turn')
-        state_to_board(state)
+        if toMove(state) == 0:
+            player = "WHITES"
+        else:
+            player = "BLACKS"
+        if not is_terminal(state):
+            print("It is " + player + ' turn')
+            state_to_board(state)
 
     if toMove(state) == 0:
         player = 'White'
     else:
         player = 'Black'
     
-    final_utility = utility(state)
     # when the game is over, print how it ended
     print('Game over!')
     state_to_board(state)
@@ -109,7 +118,7 @@ def string_to_state(string_representation):
     # initialize the state with the move
     state = [int(string_representation[0])]
 
-    # parse the string into a state
+    # parse the string into a state and return it
     i = 1
     while i < len(string_representation):
         if string_representation[i] == '-':
@@ -122,6 +131,7 @@ def string_to_state(string_representation):
 
 # helper function to choose a start state for the game
 def get_random_state(policy_table):
+    # add all non-terminal states to the possible states list, and return a random one
     possible_states = []
     for key in policy_table.keys():
         state = string_to_state(key)
@@ -131,11 +141,13 @@ def get_random_state(policy_table):
 
 if __name__ == '__main__':
     # make network
-    network = create_network(10, 3)
+    network = create_network(12, 6)
 
     # fetch training data from initial state
     policy_table = create_policy_table(INITIAL_STATE)
+
     # train the network
     train_network(network, policy_table)
 
+    # launch a simulation of the game with a random non-terminal state from the policy table
     play_hexapawn(network, get_random_state(policy_table))
